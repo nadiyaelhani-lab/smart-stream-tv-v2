@@ -1,5 +1,5 @@
 
-import { getChannels } from "./services/api.js";
+import { getChannels } from "./api.js";
 import { displayChannels } from "./ui/channels.js";
 import { showPreview } from "./ui/preview.js";
 
