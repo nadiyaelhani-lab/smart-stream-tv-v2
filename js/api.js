@@ -81,3 +81,18 @@ export const deleteChannel = async (id) => {
     // Je récupère la réponse JSON du serveur.
     return response.json();
 };
+export async function addChannel(channel) {
+    const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(channel)
+    });
+
+    if (!response.ok) {
+        throw new Error("Erreur lors de l'ajout de la chaîne");
+    }
+
+    return await response.json();
+}

@@ -1,35 +1,121 @@
+import {
+    getChannels,
+    updateChannel,
+    deleteChannel,
+    addChannel
+} from "./api.js";
 
-import { getChannels, updateChannel, deleteChannel } from "./api.js";import { displayChannels } from "./ui/channels.js";
+import { displayChannels } from "./ui/channels.js";
 import { showPreview } from "./ui/preview.js";
 
 const search = document.querySelector("#search");
 const allBtn = document.querySelector("#all-btn");
 const favoritesBtn = document.querySelector("#favorites-btn");
 const blacklistBtn = document.querySelector("#blacklist-btn");
+
 async function initApp() {
+    
     document.querySelector("#loading").classList.remove("hidden");
 
     try {
         const channels = await getChannels();
         console.log(channels);
-        let currentFilter = "all";
-        blacklistBtn.addEventListener("click", function () {
-    currentFilter = "blacklist";
-const text = search.value.toLowerCase().trim();
+        let currentFilter = localStorage.getItem("selectedFilter") || "all";
 
-const filtered = channels.filter(channel =>
-    channel.isBlacklisted === true &&
-    (
-        channel.name.toLowerCase().includes(text) ||
-        channel.channelNumber.includes(text) ||
-        channel.category.toLowerCase().includes(text)
-    )
-);
+if (!["all", "favorites"].includes(currentFilter)) {
+    currentFilter = "all";
+}
+        function renderChannels() {
+    const text = search.value.toLowerCase().trim();
+
+    const filtered = channels.filter(channel => {
+        let matchesFilter = false;
+
+        if (currentFilter === "all") {
+            matchesFilter = channel.isBlacklisted !== true;
+        } else if (currentFilter === "favorites") {
+            matchesFilter =
+                channel.isFavorite === true &&
+                channel.isBlacklisted !== true;
+        } else if (currentFilter === "blacklist") {
+            matchesFilter = channel.isBlacklisted === true;
+        }
+
+        const matchesSearch =
+            channel.name.toLowerCase().includes(text) ||
+            String(channel.channelNumber).includes(text) ||
+            (channel.category || "").toLowerCase().includes(text);
+
+        return matchesFilter && matchesSearch;
+    });
 
     displayChannels(filtered, showPreview);
+    
+}
+
+const form = document.querySelector("#add-channel-form");
+const formError = document.querySelector("#form-error");
+const formSuccess = document.querySelector("#form-success");
+
+form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const number = document.querySelector("#channel-number").value.trim();
+    const name = document.querySelector("#channel-name").value.trim();
+    const category = document.querySelector("#channel-category").value.trim();
+    const logo = document.querySelector("#channel-logo").value.trim();
+
+    formError.classList.add("hidden");
+    formSuccess.classList.add("hidden");
+
+    // Validation obligatoire
+    if (!number || !name || Number(number) < 1) {
+        formError.textContent =
+            "Le numéro et le nom sont obligatoires.";
+        formError.classList.remove("hidden");
+        return;
+    }
+
+    const newChannel = {
+        channelNumber: number,
+        name: name,
+        category: category,
+        logo: logo,
+        previewImage: logo || "https://placehold.co/800x450?text=Smart+Stream+TV",
+        isFavorite: false,
+        isBlacklisted: false
+    };
+
+    try {
+        const createdChannel = await addChannel(newChannel);
+
+        channels.push(createdChannel);
+
+        currentFilter = "all";
+        search.value = "";
+
+        renderChannels();
+        form.reset();
+
+        formSuccess.textContent = "Chaîne ajoutée avec succès !";
+        formSuccess.classList.remove("hidden");
+
+    } catch (error) {
+        console.error("Erreur POST :", error);
+
+        formError.textContent =
+            "Impossible d'ajouter la chaîne.";
+        formError.classList.remove("hidden");
+    }
+});
+
+blacklistBtn.addEventListener("click", function () {
+    currentFilter = "blacklist";
+    renderChannels();
 });
         favoritesBtn.addEventListener("click", function () {
     currentFilter = "favorites";
+    localStorage.setItem("selectedFilter", "favorites");
 
 const text = search.value.toLowerCase().trim();
   const filtered = channels.filter(channel =>
@@ -42,6 +128,7 @@ const text = search.value.toLowerCase().trim();
 });
      allBtn.addEventListener("click", function () {
     currentFilter = "all";
+    localStorage.setItem("selectedFilter", "all");
 
     const text = search.value.toLowerCase().trim();
 const filtered = channels.filter(channel =>
@@ -55,12 +142,7 @@ const filtered = channels.filter(channel =>
 
     displayChannels(filtered, showPreview);
 });
-
-const activeChannels = channels.filter(channel =>
-    channel.isBlacklisted !== true
-);
-
-displayChannels(activeChannels, showPreview);
+renderChannels();
 const list = document.querySelector("#channels-list");
 
 list.addEventListener("click", async (event) => {

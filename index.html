@@ -47,6 +47,57 @@
     <section class="flex-1 min-w-0 p-5 md:p-10">
       <div class="max-w-4xl mx-auto">
 
+<!-- FORMULAIRE AJOUTER UNE CHAÎNE -->
+<section class="bg-slate-800 p-6 rounded-xl mb-6">
+    <h2 class="text-xl font-bold text-white mb-4">
+        Ajouter une chaîne
+    </h2>
+
+    <form id="add-channel-form" class="flex flex-col gap-3">
+
+        <input
+            type="number"
+            id="channel-number"
+            placeholder="Numéro de chaîne"
+            min="1"
+            class="w-full p-3 rounded-lg bg-slate-700 text-white"
+        >
+
+        <input
+            type="text"
+            id="channel-name"
+            placeholder="Nom de la chaîne"
+            class="w-full p-3 rounded-lg bg-slate-700 text-white"
+        >
+
+        <input
+            type="text"
+            id="channel-category"
+            placeholder="Catégorie"
+            class="w-full p-3 rounded-lg bg-slate-700 text-white"
+        >
+
+        <input
+            type="url"
+            id="channel-logo"
+            placeholder="URL du logo"
+            class="w-full p-3 rounded-lg bg-slate-700 text-white"
+        >
+
+        <p id="form-error" class="hidden text-red-400 text-sm"></p>
+
+        <p id="form-success" class="hidden text-green-400 text-sm"></p>
+
+        <button
+            type="submit"
+            class="bg-purple-600 hover:bg-purple-700 text-white font-semibold p-3 rounded-lg transition"
+        >
+            Ajouter la chaîne
+        </button>
+    </form>
+</section>
+
+
         <p class="text-purple-400 font-semibold mb-2">
         </p>
 
