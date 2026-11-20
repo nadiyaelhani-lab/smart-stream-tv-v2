@@ -30,7 +30,21 @@ button.dataset.id = channel.id;
 
         button.appendChild(logo);
         button.appendChild(title);
-        const favorite = document.createElement("button");
+if (channel.isBlacklisted === true) {
+    const restoreBtn = document.createElement("button");
+restoreBtn.dataset.action = "restore";
+restoreBtn.textContent = "Restaurer";
+restoreBtn.className = "ml-auto text-green-400 text-sm";
+
+button.appendChild(restoreBtn);
+const deleteBtn = document.createElement("button");
+deleteBtn.dataset.action = "delete";
+deleteBtn.textContent = "Supprimer";
+deleteBtn.className = "text-red-400 text-sm";
+
+button.appendChild(deleteBtn);
+} else {
+    const favorite = document.createElement("button");
 
 favorite.dataset.action = "favorite";
 
@@ -39,8 +53,15 @@ favorite.textContent = channel.isFavorite ? "\u2605" : "\u2606";
 favorite.className = "ml-auto text-yellow-400 text-2xl";
 
 button.appendChild(favorite);
-        
-        list.appendChild(button);
+const blacklistButton = document.createElement("button");
+blacklistButton.dataset.action = "blacklist";
+blacklistButton.textContent = "Bloquer";
+blacklistButton.className = "text-red-400 text-sm";
+button.appendChild(blacklistButton);
+}
+
+list.appendChild(button);
+
     });
 });
 }
